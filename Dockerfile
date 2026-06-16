@@ -11,15 +11,20 @@ LABEL changelog-url="https://github.com/n0xa/hpfeeds-cif/commits/master"
 
 ENV DEBIAN_FRONTEND "noninteractive"
 
+# Use Python 3.11 for cifsdk compatibility (avoids SafeConfigParser issue)
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get clean
+
 # hadolint ignore=DL3008,DL3005
 RUN apt-get update \
   && apt-get upgrade -y \
-  && apt-get install --no-install-recommends -y gcc git python3-dev python3-pip python3-venv build-essential libffi-dev libssl-dev \
+  && apt-get install --no-install-recommends -y gcc git python3.11 python3.11-dev python3.11-venv build-essential libffi-dev libssl-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment
-RUN python3 -m venv /opt/venv
+RUN python3.11 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt /opt/requirements.txt
