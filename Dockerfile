@@ -35,4 +35,10 @@ RUN pip install --upgrade pip setuptools wheel \
 COPY . /opt/
 RUN chmod 0755 /opt/entrypoint.sh
 
+# Drop root: this service only connects out to CIF/hpfeeds and writes
+# its config under /opt, none of which need privileged access.
+RUN groupadd -r hpfeeds-cif && useradd -r -g hpfeeds-cif hpfeeds-cif \
+  && chown -R hpfeeds-cif:hpfeeds-cif /opt
+USER hpfeeds-cif
+
 ENTRYPOINT ["/opt/entrypoint.sh"]
